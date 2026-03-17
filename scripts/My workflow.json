@@ -1,0 +1,284 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "login-check",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f3df1ea0-5e0b-4491-a2a2-ac865688371b",
+      "name": "Webhook",
+      "webhookId": "1a392020-085d-4958-97c9-4f8fe6c622f7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "141c7334-7f39-40f6-b20e-342490be3b23",
+              "leftValue": "={{ /union|select|insert|update|delete|drop/.test($json.body.payload) }}",
+              "rightValue": ".*(union\nselect\ninsert\nupdate\ndelete\ndrop).*",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7f25d4f9-17e6-4999-9056-0477d626d939",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "sqli_incidents",
+          "mode": "list",
+          "cachedResultName": "sqli_incidents"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "source_ip": "={{ $json.body.ip }}",
+            "username_attempt": "={{ $json.body.username }}",
+            "malicious_payload": "={{ $json.body.payload }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source_ip",
+              "displayName": "source_ip",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username_attempt",
+              "displayName": "username_attempt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "malicious_payload",
+              "displayName": "malicious_payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "outputColumns": [
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "0f8f4108-0916-44ad-a4be-43afbeb4877a",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "tnmkz9jzBLLyyIyw",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "security@agongar.local",
+        "toEmail": "soc@agongar.local",
+        "subject": "[ALERTA CRÍTICA] Intento de Inyección SQL detectado",
+        "html": "=<h2>¡Alerta de Seguridad Crítica!</h2>\n<p>El sistema WAF ha detectado y bloqueado un intento de Inyección SQL.</p>\n<ul>\n  <li><strong>IP Origen:</strong> {{$json.source_ip}}</li>\n  <li><strong>Usuario atacado:</strong> {{$json.username_attempt}}</li>\n  <li><strong>Payload malicioso:</strong> <span style=\"color:red;\">{{$json.malicious_payload}}</span></li>\n</ul>\n<p>El incidente ha sido registrado en la base de datos con el ID: {{$json.id}}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "47f64bf2-b907-4492-a519-99e8d5118f52",
+      "name": "Send an Email",
+      "webhookId": "2afc6ead-951e-4b9d-b930-6aacbce93443",
+      "credentials": {
+        "smtp": {
+          "id": "QTgUCnhw7Dma3zNH",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.payload = item.json.body.payload.toLowerCase();\n}\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c3469c53-0631-4d5f-855e-ec974277b8e0",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "1195038665",
+        "text": "=🚨 ¡ALERTA CRÍTICA WAF! 🚨\nSe ha bloqueado un intento de Inyección SQL.\n\n🌐 IP: {{$json.source_ip}}\n👤 Usuario: {{$json.username_attempt}}\n💀 Payload: <code>{{$json.malicious_payload}}</code>",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "0aa9fcbf-edd3-491f-80a5-80f53042c7b9",
+      "name": "Send a text message",
+      "webhookId": "48afabf4-6b08-4b80-9c95-9dec9f8550b1",
+      "credentials": {
+        "telegramApi": {
+          "id": "nEwMk3kbbtl9MurO",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "930f584b-2b0b-4f73-877b-9ce0c753ad93",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bc7cc31edb1d51c21d5cd8b2dda1885fd6db15ce25d5f924e450e2c2d6b36a31"
+  },
+  "id": "NqrTJXjO33Wrvapz",
+  "tags": []
+}
