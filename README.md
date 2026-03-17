@@ -17,9 +17,9 @@ Se ha optado por este escenario y lógica de detección por varias razones:
 * **Respuesta Proporcional Multicanal:** Se implementa una respuesta técnica completa. Primero, **persistencia forense** guardando la evidencia del ataque (IP, usuario, payload) en una tabla específica (`sqli_incidents`) de PostgreSQL. Posteriormente, se escala el incidente con **dos alertas simultáneas**: un correo electrónico al equipo SOC vía Mailhog y un mensaje instantáneo de Telegram al administrador, garantizando una notificación inmediata del incidente crítico.
 
 ## 4. Instrucciones para probar el workflow
-Para probar el correcto funcionamiento del workflow, se deben realizar dos pruebas utilizando herramientas como Postman o cURL, enviando peticiones `POST` a la URL del Webhook de prueba de n8n.
+Para probar el correcto funcionamiento del workflow, se deben realizar las pruebas detalladas en el archivo adjunto `Payloads_Ejemplo.txt` utilizando herramientas como Postman, enviando peticiones `POST` a la URL del Webhook de prueba de n8n.
 
-**Prueba Positiva (Simulación de Ataque):**
+**Ejemplo de Prueba Positiva (Simulación de Ataque):**
 1. Activar "Listen for Test Event" en el Webhook de n8n.
 2. Enviar la siguiente petición `POST` en formato JSON:
    ```json
@@ -28,5 +28,7 @@ Para probar el correcto funcionamiento del workflow, se deben realizar dos prueb
      "username": "admin",
      "payload": "admin UNION SELECT * FROM passwords"
    }
+
+## Flujo de trabajo de N8N
 
 ![alt text](image.png)

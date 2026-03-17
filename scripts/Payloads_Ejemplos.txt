@@ -1,0 +1,24 @@
+--- PAYLOADS de ejemplo para WAF ---
+
+url de envío: http://localhost:5678/webhook-test/login-check
+
+1. Ataque de SQL Injection (UNION-Based) - DEBE SER BLOQUEADO
+{
+  "ip": "192.168.1.55",
+  "username": "admin",
+  "payload": "admin UNION SELECT * FROM passwords"
+}
+
+2. Ataque de destrucción (SQLi DROP) - DEBE SER BLOQUEADO
+{
+  "ip": "198.51.100.7",
+  "username": "admin",
+  "payload": "'; DROP TABLE clientes;--"
+}
+
+3. Tráfico Legítimo - NO DEBE SER BLOQUEADO
+{
+  "ip": "192.168.1.100",
+  "username": "jefe_ventas",
+  "payload": "Hola, necesito acceso al panel de ventas de este mes. ¡Gracias!"
+}
