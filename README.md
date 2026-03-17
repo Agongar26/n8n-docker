@@ -38,21 +38,26 @@ Para probar el correcto funcionamiento del workflow, se deben realizar las prueb
      "username": "admin",
      "payload": "admin UNION SELECT * FROM passwords"
    }
+```
 
 **2. Ataque de destrucción (SQLi DROP) - DEBE SER BLOQUEAD**
-    ```json
+   ```json
    {
-    "ip": "198.51.100.7",
-    "username": "admin",
-    "payload": "'; DROP TABLE clientes;--"
-    }
+     "ip": "198.51.100.7",
+     "username": "admin",
+     "payload": "'; DROP TABLE clientes;--"
+   }
+```
 
 **Ejemplos de Prueba Negativa (Simulación de JSON permitido):**
 1. Activar "Listen for Test Event" en el Webhook de n8n.
 2. Enviar la siguiente petición `POST` en formato JSON:
-    ```json
-    {
-    "ip": "192.168.1.100",
-    "username": "jefe_ventas",
-    "payload": "Hola, necesito acceso al panel de ventas de este mes. ¡Gracias!"
-    }
+
+**3. Tráfico Legítimo - NO DEBE SER BLOQUEADO**
+   ```json
+   {
+     "ip": "192.168.1.100",
+     "username": "jefe_ventas",
+     "payload": "Hola, necesito acceso al panel de ventas de este mes. ¡Gracias!"
+   }
+```
