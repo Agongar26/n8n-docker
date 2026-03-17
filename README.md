@@ -29,4 +29,4 @@ Para probar el correcto funcionamiento del workflow, se deben realizar dos prueb
      "payload": "admin UNION SELECT * FROM passwords"
    }
 
-   ![alt text](image.png)
+![alt text](image.png)
