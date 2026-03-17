@@ -5,15 +5,16 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "login-check",
+        "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        -624,
+        96
       ],
-      "id": "f3df1ea0-5e0b-4491-a2a2-ac865688371b",
+      "id": "86783657-d7da-4afa-8092-24045db8ceed",
       "name": "Webhook",
       "webhookId": "1a392020-085d-4958-97c9-4f8fe6c622f7"
     },
@@ -45,10 +46,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        416,
-        0
+        -208,
+        96
       ],
-      "id": "7f25d4f9-17e6-4999-9056-0477d626d939",
+      "id": "b289d300-45de-46b4-ae17-cfa1176d0db8",
       "name": "If"
     },
     {
@@ -136,14 +137,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        624,
-        -96
+        0,
+        -208
       ],
-      "id": "0f8f4108-0916-44ad-a4be-43afbeb4877a",
+      "id": "6304d726-1ea0-4417-9a68-cbfdcd238f76",
       "name": "Insert rows in a table",
       "credentials": {
         "postgres": {
-          "id": "tnmkz9jzBLLyyIyw",
+          "id": "ALwS8lgBKjiPU4rT",
           "name": "Postgres account"
         }
       }
@@ -153,21 +154,21 @@
         "fromEmail": "security@agongar.local",
         "toEmail": "soc@agongar.local",
         "subject": "[ALERTA CRÍTICA] Intento de Inyección SQL detectado",
-        "html": "=<h2>¡Alerta de Seguridad Crítica!</h2>\n<p>El sistema WAF ha detectado y bloqueado un intento de Inyección SQL.</p>\n<ul>\n  <li><strong>IP Origen:</strong> {{$json.source_ip}}</li>\n  <li><strong>Usuario atacado:</strong> {{$json.username_attempt}}</li>\n  <li><strong>Payload malicioso:</strong> <span style=\"color:red;\">{{$json.malicious_payload}}</span></li>\n</ul>\n<p>El incidente ha sido registrado en la base de datos con el ID: {{$json.id}}</p>",
+        "html": "=<h2>¡Alerta de Seguridad Crítica!</h2>\n<p>El sistema WAF ha detectado y bloqueado un intento de Inyección SQL.</p>\n<ul>\n  <li><strong>IP Origen:</strong> {{$json.body.ip}}</li>\n  <li><strong>Usuario atacado:</strong> {{$json.body.username}}</li>\n  <li><strong>Payload malicioso:</strong> <span style=\"color:red;\">{{$json.body.payload}}</span></li>\n</ul>\n<p>El incidente ha sido registrado en la base de datos con el ID: {{$workflow.id}}</p>",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        1040,
-        -96
+        0,
+        80
       ],
-      "id": "47f64bf2-b907-4492-a519-99e8d5118f52",
+      "id": "8924851d-2d6a-4bbd-8746-a9698e990186",
       "name": "Send an Email",
       "webhookId": "2afc6ead-951e-4b9d-b930-6aacbce93443",
       "credentials": {
         "smtp": {
-          "id": "QTgUCnhw7Dma3zNH",
+          "id": "U9Islh6Qk4nOQ5CF",
           "name": "SMTP account"
         }
       }
@@ -179,16 +180,16 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        208,
-        0
+        -416,
+        96
       ],
-      "id": "c3469c53-0631-4d5f-855e-ec974277b8e0",
+      "id": "e28eab0e-9a0b-437a-8d86-33e9311f1b35",
       "name": "Code in JavaScript"
     },
     {
       "parameters": {
         "chatId": "1195038665",
-        "text": "=🚨 ¡ALERTA CRÍTICA WAF! 🚨\nSe ha bloqueado un intento de Inyección SQL.\n\n🌐 IP: {{$json.source_ip}}\n👤 Usuario: {{$json.username_attempt}}\n💀 Payload: <code>{{$json.malicious_payload}}</code>",
+        "text": "=🚨 ¡ALERTA CRÍTICA WAF! 🚨\nSe ha bloqueado un intento de Inyección SQL.\n\n🌐 IP: {{$json.body.ip}}\n👤 Usuario: {{$json.body.username}}\n💀 Payload: <code>{{$json.body.payload}}</code>",
         "additionalFields": {
           "parse_mode": "HTML"
         }
@@ -196,18 +197,48 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        832,
-        -96
+        0,
+        -64
       ],
-      "id": "0aa9fcbf-edd3-491f-80a5-80f53042c7b9",
-      "name": "Send a text message",
+      "id": "97726e63-21aa-4194-bbb1-32c110e9a08f",
+      "name": "Send a text message1",
       "webhookId": "48afabf4-6b08-4b80-9c95-9dec9f8550b1",
       "credentials": {
         "telegramApi": {
-          "id": "nEwMk3kbbtl9MurO",
+          "id": "JekjKaojfuHq4NCl",
           "name": "Telegram account"
         }
       }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        208,
+        -64
+      ],
+      "id": "5068dac8-e125-4538-a3cc-3f7f97546426",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        240
+      ],
+      "id": "90f4bde8-e13c-42f7-9def-13a688376417",
+      "name": "Respond to Webhook1"
     }
   ],
   "pinData": {},
@@ -230,16 +261,32 @@
             "node": "Insert rows in a table",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
           }
         ],
-        []
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Insert rows in a table": {
       "main": [
         [
           {
-            "node": "Send a text message",
+            "node": "Respond to Webhook",
             "type": "main",
             "index": 0
           }
@@ -257,11 +304,22 @@
         ]
       ]
     },
-    "Send a text message": {
+    "Send a text message1": {
       "main": [
         [
           {
-            "node": "Send an Email",
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
             "type": "main",
             "index": 0
           }
@@ -272,13 +330,14 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "930f584b-2b0b-4f73-877b-9ce0c753ad93",
+  "versionId": "7da17846-1182-47d4-9e9f-168b6d428460",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "bc7cc31edb1d51c21d5cd8b2dda1885fd6db15ce25d5f924e450e2c2d6b36a31"
+    "instanceId": "fed3064f5e0346b468b840df8b85e8233479a23917c2c352ba334e641ab09827"
   },
-  "id": "NqrTJXjO33Wrvapz",
+  "id": "RA5h41UFLO2cPyno",
   "tags": []
 }
