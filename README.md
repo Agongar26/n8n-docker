@@ -20,7 +20,13 @@ Se ha optado por este escenario y lógica de detección por varias razones:
 * **Precisión:** El uso de expresiones regulares combinadas con la normalización del texto en el nodo `Code` proporciona un método robusto para detectar múltiples variantes de un mismo ataque sin generar falsos positivos en el tráfico normal.
 * **Respuesta Proporcional Multicanal:** Se implementa una respuesta técnica completa. Primero, **persistencia forense** guardando la evidencia del ataque (IP, usuario, payload) en una tabla específica (`sqli_incidents`) de PostgreSQL. Posteriormente, se escala el incidente con **dos alertas simultáneas**: un correo electrónico al equipo SOC vía Mailhog y un mensaje instantáneo de Telegram al administrador, garantizando una notificación inmediata del incidente crítico.
 
-## 4. Instrucciones para probar el workflow
+## 4. Configuración de Credenciales
+Para que el flujo funcione tras la importación, se deben configurar las siguientes credenciales:
+* **PostgreSQL:** Host `postgres`, Puerto `5432`, Base de datos `n8n_db`.
+* **Telegram:** API Token obtenido de @BotFather.
+* **SMTP (Mailhog):** Host `mailhog`, Puerto `1025`, sin autenticación.
+
+## 5. Instrucciones para probar el workflow
 Para probar el correcto funcionamiento del workflow, se deben realizar las pruebas detalladas en el archivo adjunto `Payloads_Ejemplo.txt` utilizando herramientas como Postman, enviando peticiones `POST` a la URL del Webhook de prueba de n8n.
 
 **Nota sobre URLs de Webhook:**
