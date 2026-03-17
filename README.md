@@ -27,12 +27,32 @@ Para probar el correcto funcionamiento del workflow, se deben realizar las prueb
 * **URL de Producción:** `http://localhost:5678/webhook/login-check`. El flujo ha sido activado para funcionar permanentemente en esta URL. Las ejecuciones pueden consultarse en el historial (Executions) de n8n.
 * **URL de Test:** `http://localhost:5678/webhook-test/login-check`. Usar esta URL si se desea ver la ejecución en tiempo real desde el editor de n8n activando el botón "Listen for Test Event".
 
-**Ejemplo de Prueba Positiva (Simulación de Ataque):**
+**Ejemplos de Prueba Positiva (Simulación de Ataque):**
 1. Activar "Listen for Test Event" en el Webhook de n8n.
 2. Enviar la siguiente petición `POST` en formato JSON:
+
+**1. Ataque de SQL Injection (UNION-Based) - DEBE SER BLOQUEADO**
    ```json
    {
      "ip": "192.168.1.55",
      "username": "admin",
      "payload": "admin UNION SELECT * FROM passwords"
    }
+
+**2. Ataque de destrucción (SQLi DROP) - DEBE SER BLOQUEAD**
+    ```json
+   {
+    "ip": "198.51.100.7",
+    "username": "admin",
+    "payload": "'; DROP TABLE clientes;--"
+    }
+
+**Ejemplos de Prueba Negativa (Simulación de JSON permitido):**
+1. Activar "Listen for Test Event" en el Webhook de n8n.
+2. Enviar la siguiente petición `POST` en formato JSON:
+    ```json
+    {
+    "ip": "192.168.1.100",
+    "username": "jefe_ventas",
+    "payload": "Hola, necesito acceso al panel de ventas de este mes. ¡Gracias!"
+    }
