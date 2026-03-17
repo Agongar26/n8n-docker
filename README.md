@@ -1,12 +1,16 @@
 # Práctica n8n: WAF - Detección de Inyección SQL (SQLi)
 
+## Flujo de trabajo de N8N
+
+![alt text](image.png)
+
 ## 1. Descripción del incidente que se detecta
 Este flujo actúa como un WAF (Web Application Firewall) básico, diseñado para detectar y mitigar **intentos de Inyección SQL (SQLi)** en tiempo real. Analiza los datos de entrada (payloads) enviados a través de formularios web simulados (como inicios de sesión o cajas de búsqueda) en busca de comandos maliciosos comunes. El objetivo es prevenir que un atacante extraiga información o modifique la base de datos subyacente de la aplicación.
 
 ## 2. Explicación de la lógica de detección
 El flujo se activa mediante un **Webhook** que recibe peticiones `POST` simulando el tráfico web (IP, usuario y payload). A continuación, la lógica se desarrolla en dos pasos:
-1. **Nodo Code (JavaScript):** Normaliza el payload convirtiéndolo a minúsculas (`toLowerCase()`) para asegurar que el análisis sea insensible a mayúsculas/minúsculas y evitar técnicas de evasión.
-2. **Nodo IF (Evaluación Lógica):** Utiliza código JavaScript nativo y expresiones regulares (`.test()`) para inspeccionar el payload normalizado. Busca palabras clave críticas de SQL, independientemente del texto que las rodee: `.*(union|select|insert|update|delete|drop).*`. 
+1. **Nodo Code (JavaScript):** Normaliza el payload convirtiéndolo a minúsculas, usando `toLowerCase()`, para asegurar que el análisis sea insensible a mayúsculas/minúsculas y evitar técnicas de evasión.
+2. **Nodo IF (Evaluación Lógica):** Utiliza código JavaScript nativo y expresiones regulares (`.test()`) para inspeccionar el payload normalizado. Busca palabras clave críticas de SQL, independientemente del texto que las rodee: `{{ /union|select|insert|update|delete|drop/.test($json.body.payload) }}`. 
    * Si detecta estos comandos (rama `True`), clasifica el tráfico como un ataque.
    * Si no los detecta (rama `False`), asume que es tráfico legítimo y detiene el análisis.
 
@@ -19,6 +23,10 @@ Se ha optado por este escenario y lógica de detección por varias razones:
 ## 4. Instrucciones para probar el workflow
 Para probar el correcto funcionamiento del workflow, se deben realizar las pruebas detalladas en el archivo adjunto `Payloads_Ejemplo.txt` utilizando herramientas como Postman, enviando peticiones `POST` a la URL del Webhook de prueba de n8n.
 
+**Nota sobre URLs de Webhook:**
+* **URL de Producción:** `http://localhost:5678/webhook/login-check`. El flujo ha sido activado para funcionar permanentemente en esta URL. Las ejecuciones pueden consultarse en el historial (Executions) de n8n.
+* **URL de Test:** `http://localhost:5678/webhook-test/login-check`. Usar esta URL si se desea ver la ejecución en tiempo real desde el editor de n8n activando el botón "Listen for Test Event".
+
 **Ejemplo de Prueba Positiva (Simulación de Ataque):**
 1. Activar "Listen for Test Event" en el Webhook de n8n.
 2. Enviar la siguiente petición `POST` en formato JSON:
@@ -28,7 +36,3 @@ Para probar el correcto funcionamiento del workflow, se deben realizar las prueb
      "username": "admin",
      "payload": "admin UNION SELECT * FROM passwords"
    }
-
-## Flujo de trabajo de N8N
-
-![alt text](image.png)
