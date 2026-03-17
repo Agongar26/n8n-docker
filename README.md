@@ -85,3 +85,9 @@ Para probar el correcto funcionamiento del workflow, se deben realizar las prueb
      "payload": "Hola, necesito acceso al panel de ventas de este mes. ¡Gracias!"
    }
 ```
+
+## 7. Reflexión sobre posibles mejoras
+* **Refinamiento de la lógica para reducir Falsos Positivos:** La expresión regular actual es muy agresiva y podría bloquear conversaciones legítimas sobre bases de datos. Una mejora sería refinar la Regex para que solo salte si las palabras clave van acompañadas de sintaxis SQL real (como comillas `'`, guiones `--` o punto y coma `;`).
+* **Implementación de Mitigación Activa:** El flujo actual es reactivo (avisa y registra). Una mejora clave sería añadir un nodo que conecte con la API de un Firewall (como Cloudflare o IPTables) para banear automáticamente la dirección IP de origen tras detectar el primer intento de ataque.
+* **Enriquecimiento de Alertas:** Integrar un nodo que consulte APIs de reputación de IPs (como AbuseIPDB o VirusTotal) para adjuntar al mensaje de Telegram información sobre si la IP atacante ya ha sido reportada previamente por otros incidentes.
+* **Persistencia Avanzada:** En lugar de una tabla simple, se podría implementar un sistema de rotado de logs o exportar los datos a un SIEM (Security Information and Event Management) para un análisis de tendencias a largo plazo.
