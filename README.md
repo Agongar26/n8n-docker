@@ -20,13 +20,31 @@ Se ha optado por este escenario y lógica de detección por varias razones:
 * **Precisión:** El uso de expresiones regulares combinadas con la normalización del texto en el nodo `Code` proporciona un método robusto para detectar múltiples variantes de un mismo ataque sin generar falsos positivos en el tráfico normal.
 * **Respuesta Proporcional Multicanal:** Se implementa una respuesta técnica completa. Primero, **persistencia forense** guardando la evidencia del ataque (IP, usuario, payload) en una tabla específica (`sqli_incidents`) de PostgreSQL. Posteriormente, se escala el incidente con **dos alertas simultáneas**: un correo electrónico al equipo SOC vía Mailhog y un mensaje instantáneo de Telegram al administrador, garantizando una notificación inmediata del incidente crítico.
 
-## 4. Configuración de Credenciales
+## 4. Preparación del Entorno (Base de Datos)
+Antes de ejecutar el flujo por primera vez, es necesario crear la tabla donde se almacenarán los incidentes. Para ello, con los contenedores de Docker en ejecución, se debe ejecutar el siguiente comando en la terminal para acceder a PostgreSQL y crear la estructura necesaria:
+
+```bash
+docker exec -it postgres psql -U n8n_user -d n8n_db
+```
+
+**Una vez dentro de la consola de PostgreSQL, ejecutar la siguiente sentencia SQL:**
+```SQL
+CREATE TABLE sqli_incidents (
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    source_ip VARCHAR(50),
+    username_attempt VARCHAR(100),
+    malicious_payload TEXT
+);
+```
+
+## 5. Configuración de Credenciales
 Para que el flujo funcione tras la importación, se deben configurar las siguientes credenciales:
-* **PostgreSQL:** Host `postgres`, Puerto `5432`, Base de datos `n8n_db`.
-* **Telegram:** API Token obtenido de @BotFather.
+* **PostgreSQL:** Host `postgres`, Base de datos `n8n_db`, usuario `n8n_user`, contraseña `n8n_pass`, Puerto `5432`.
+* **Telegram:** API Token obtenido de @BotFather y tu ChatID obtenido @RawDataBot.
 * **SMTP (Mailhog):** Host `mailhog`, Puerto `1025`, sin autenticación.
 
-## 5. Instrucciones para probar el workflow
+## 6. Instrucciones para probar el workflow
 Para probar el correcto funcionamiento del workflow, se deben realizar las pruebas detalladas en el archivo adjunto `Payloads_Ejemplo.txt` utilizando herramientas como Postman, enviando peticiones `POST` a la URL del Webhook de prueba de n8n.
 
 **Nota sobre URLs de Webhook:**
